@@ -1,8 +1,9 @@
-mod ledger;
+#![crate_name = "cs_377_final_project"]
 
+mod ledger;
 use std::env::args;
 use std::process::exit;
-use ledger::init_bank;
+use crate::ledger::init_bank;
 
 fn main() {
     let args: Vec<String> = args().collect();
