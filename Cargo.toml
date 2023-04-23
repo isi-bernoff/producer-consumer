@@ -1,9 +1,7 @@
 [package]
-name = "producer-consumer"
+name = "cs-377-final-project"
 version = "0.1.0"
 rust-version = "1.65.0"
 authors = ["Isi Bernoff"]
-description = "A simple banking application with concurrent transaction execution"
+description = "A translation of COMPSCI 377's Producer/Consumer project from C/C++ into Rust"
 edition = "2021"
-
-[dependencies]
