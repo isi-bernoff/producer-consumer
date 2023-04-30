@@ -1,4 +1,4 @@
-#![crate_name = "cs_377_final_project"]
+#![crate_name = "producer_consumer"]
 
 mod ledger;
 use std::env::args;
@@ -13,6 +13,6 @@ fn main() {
         exit(-1);
     }
 
-    let n: u8 = args[1].parse().unwrap();
+    let n: u16 = args[1].parse().unwrap();
     init_bank(n, args[2].clone());
 }

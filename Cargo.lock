@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "cs-377-final-project"
+name = "producer-consumer"
 version = "0.1.0"

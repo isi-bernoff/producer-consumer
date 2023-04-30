@@ -1,7 +1,7 @@
 [package]
-name = "cs-377-final-project"
+name = "producer-consumer"
 version = "0.1.0"
 rust-version = "1.65.0"
-authors = ["Isi Bernoff"]
-description = "A translation of COMPSCI 377's Producer/Consumer project from C/C++ into Rust"
+authors = ["Isi Bernoff <ibernoff@umass.edu>", "Dave Dirnfeld <ddirnfeld@umass.edu>", "Calvin Chai <kchai@umass.edu>"]
+description = "A translation of UMass TAs Dave Dirnfield and Calvin Chai's C/C++ Producer/Consumer project for Operating Systems into Rust"
 edition = "2021"
