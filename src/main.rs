@@ -15,6 +15,6 @@ fn main() {
 
     let num_threads: u16 = args[1].parse().unwrap();
     let ledger_filename: String = args[2].clone();
-    let bank: Bank = Bank::new(10);
-    bank.init(num_threads, ledger_filename);
+    let bank: Bank = Bank::new(10, ledger_filename);
+    bank.init(num_threads);
 }

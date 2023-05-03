@@ -20,26 +20,26 @@ $ ./multibank <num_threads> <ledger_filename>
 ### `Bank`
 #### Fields
 - `threads`: A `HashMap` of `u16` identifiers to `Threads`
-- `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-guarded `i32` balances
+- `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `i32` balances
 - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
 - `num_successes`: The `u16` number of `Transaction`s that succeeded
 - `num_failures`: The `u16` number of `Transaction`s that failed
 ## Functions
 ```rs
-pub fn new(num_accounts: u16) -> Bank
+pub fn new(num_accounts: u16, ledger_filename: String) -> Bank
 ```
-Constructs a new `Bank` object and initializes `accounts`
+Constructs a new `Bank` object and initializes its `accounts` and `ledger`
 #### Parameters
 - `num_accounts`: The number of `account`s to initialize
+- `ledger_filename`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode>` on each line
 #### Returns
 The new `Bank` object
 ```rs
-pub fn init(num_threads: u16, ledger_filename: String)
+pub fn init(num_threads: u16)
 ```
 Initializes this `Bank`'s `threads` and `ledger`
 #### Parameters
 - `num_threads`: The number of `Thread`s to initialize
-- `ledger_filename`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode>` on each line
 ```rs
 pub fn deposit(thread_id: u16, deposit_id: u16, account_id: u16, amount: i32) -> String
 ```

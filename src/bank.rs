@@ -23,7 +23,7 @@ struct Transaction {
 
 /// #### Fields:
 /// - `threads`: A `HashMap` of `u16` identifiers to `Threads`
-/// - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-guarded `i32`
+/// - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `i32`
 ///    balances
 /// - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
 /// - `num_successes`: The `u16` number of `Transaction`s that succeeded
@@ -37,21 +37,32 @@ pub struct Bank {
 }
 
 impl Bank {
-    /// Constructs a new `Bank` object and initializes `accounts`
+    /// Constructs a new `Bank` object and initializes its `accounts`
+    /// `ledger`
     /// #### Parameters
-    /// `num_accounts`: The number of `account`s to initialize
-    /// ### Returns
-    /// The new `Bank` object
-    pub fn new(num_accounts: u16) -> Self {
-        todo!();
-    }
-    
-    /// Initializes this `Bank`'s `threads` and `ledger`
-    /// #### Parameters
-    /// - `num_threads`: The number of `Thread`s to initialize
+    /// - `num_accounts`: The number of `account`s to initialize
     /// - `ledger_filename`: The name of a ledger file containing transactions
     /// formatted `<from_id> <to_id> <amount> <mode>` on each line
-    pub fn init(&self, num_threads: u16, ledger_filename: String) {
+    /// ### Returns
+    /// The new `Bank` object
+    pub fn new(num_accounts: u16, ledger_filename: String) -> Self {
+        let threads: HashMap<u16, Thread> = HashMap::new();
+        let mut accounts: HashMap<u16, Mutex<i32>> = HashMap::new();
+        let mut ledger: HashMap<u16, Transaction> = HashMap::new();
+        let num_successes: u16 = 0;
+        let num_failures: u16 = 0;
+
+        for id in 0..num_accounts {
+            accounts.insert(id, Mutex::new(0));
+        }
+
+        Self {threads, accounts, ledger, num_successes, num_failures}
+    }
+    
+    /// Initializes this `Bank`'s `threads`
+    /// #### Parameters
+    /// - `num_threads`: The number of `Thread`s to initialize
+    pub fn init(&self, num_threads: u16) {
         todo!();
     }
     
