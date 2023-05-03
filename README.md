@@ -26,7 +26,7 @@ $ ./multibank <num_threads> <ledger_filename>
 - `num_failures`: The `u16` number of `Transaction`s that failed
 ## Functions
 ```rs
-pub fn new(num_accounts: u16) -> Bank`
+pub fn new(num_accounts: u16) -> Bank
 ```
 Constructs a new `Bank` object and initializes `accounts`
 #### Parameters
@@ -54,7 +54,7 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 A success message if the deposit succeeds and a failure message
 otherwise
 ```rs
-withdraw(thread_id: u16, withdrawal_id: u16, account_id: u16, amount: i32) -> String
+pub fn withdraw(thread_id: u16, withdrawal_id: u16, account_id: u16, amount: i32) -> String
 ```
 Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successes` or `num_failures` depending on if the withdrawal works
 #### Parameters
