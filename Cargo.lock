@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "producer-consumer"
+name = "multi-bank"
 version = "0.1.0"

@@ -1,7 +1,7 @@
 [package]
-name = "producer-consumer"
+name = "multi-bank"
 version = "0.1.0"
 rust-version = "1.65.0"
 authors = ["Isi Bernoff <ibernoff@umass.edu>", "Dave Dirnfeld <ddirnfeld@umass.edu>", "Calvin Chai <kchai@umass.edu>"]
-description = "A translation of UMass TAs Dave Dirnfield and Calvin Chai's C/C++ Producer/Consumer project for Operating Systems into Rust"
+description = "This project is a translation of UMass's Operating Systems TAs Dave Dirnfield and Calvin Chai's C/C++ Producer/Consumercs project into Rust. It is a banking application that uses threads to process transactions from a ledger file concurrently."
 edition = "2021"
