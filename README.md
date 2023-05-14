@@ -15,18 +15,18 @@ $ cargo run <num_threads> <ledger_filename>
 #### Fields
 - `from_id`: The `u16` identifier of the account having its money removed
 - `to_id`: The `u16` identifier of the account having receiving money
-- `amount`: The `i32` amount of money being moved
+- `amount`: The `f32` amount of money being moved
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
 #### Fields
 - `threads`: A `HashMap` of `u16` identifiers to `Threads`
-- `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `i32` balances
+- `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
 - `num_successes`: The `u16` number of `Transaction`s that succeeded
 - `num_failures`: The `u16` number of `Transaction`s that failed
 ## Methods
 ```rs
-Transaction::new(from_id: u16, to_id: u16, amount: i32, mode_id: u8) -> Transaction
+Transaction::new(from_id: u16, to_id: u16, amount: f32, mode_id: u8) -> Transaction
 ```
 Constructs and initializes a new `Transaction` object
 #### Parameters
@@ -39,7 +39,7 @@ The new `Transaction` object
 ```rs
 Bank::new(num_accounts: u16, ledger_filepath: String) -> Bank
 ```
-Constructs a new `Bank` object and initializes its `accounts` and `ledger`
+Constructs a new `Bank` object and initializes its accounts, ledger, and numbers of successful and failed transactions
 #### Parameters
 - `num_accounts`: The number of `account`s to initialize
 - `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode_id>` on each line
@@ -52,7 +52,7 @@ Initializes this `Bank`'s `threads` and `ledger`
 #### Parameters
 - `num_threads`: The number of `Thread`s to initialize
 ```rs
-Bank::deposit(thread_id: u16, transaction_id: u16, account_id: u16, amount: i32) -> String
+Bank::deposit(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> String
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing
 `num_successes` or `num_failures` depending on if the deposit works
@@ -65,7 +65,7 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 A success message if the deposit succeeds and a failure message
 otherwise
 ```rs
-Bank::withdraw(thread_id: u16, transaction_id: u16, account_id: u16, amount: i32) -> String
+Bank::withdraw(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> String
 ```
 Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successes` or `num_failures` depending on if the withdrawal works
 #### Parameters
@@ -77,7 +77,7 @@ Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successe
 A success message if the withdrawal succeeds and a failure message
 otherwise
 ```rs
-Bank::transfer(thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: i32) -> String
+Bank::transfer(thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: f32) -> String
 ```
 Transfers money from one of this `Bank`'s `accounts` to another,
 incrementing `num_successes` or `num_failures` depending on if the

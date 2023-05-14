@@ -3,28 +3,27 @@ use std::thread::Thread;
 use std::sync::Mutex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::fmt::{Formatter, Display, Result};
 use self::transaction::Transaction;
 mod transaction;
 
 /// #### Fields:
 /// - `threads`: A `HashMap` of `u16` identifiers to `Threads`
-/// - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `i32`
+/// - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `f32`
 ///    balances
 /// - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
 /// - `num_successes`: The `u16` number of `Transaction`s that succeeded
 /// - `num_failures`: The `u16` number of `Transaction`s that failed
 pub struct Bank {
     threads: HashMap<u16, Thread>,
-    accounts: HashMap<u16, Mutex<i32>>,
+    accounts: HashMap<u16, Mutex<f32>>,
     ledger: HashMap<u16, Transaction>,
     num_successes: u16,
     num_failures: u16
 }
 
 impl Bank {
-    /// Constructs a new `Bank` object and initializes its `accounts` and
-    /// `ledger`
+    /// Constructs a new `Bank` object and initializes its accounts, ledger,
+    /// and numbers of successful and failed transactions
     /// #### Parameters
     /// - `num_accounts`: The number of `account`s to initialize
     /// - `ledger_filepath`: The name of a ledger file containing transactions
@@ -33,13 +32,13 @@ impl Bank {
     /// The new `Bank` object
     pub fn new(num_accounts: u16, ledger_filepath: String) -> Self {
         let threads: HashMap<u16, Thread> = HashMap::new();
-        let mut accounts: HashMap<u16, Mutex<i32>> = HashMap::new();
+        let mut accounts: HashMap<u16, Mutex<f32>> = HashMap::new();
         let mut ledger: HashMap<u16, Transaction> = HashMap::new();
         let num_successes: u16 = 0;
         let num_failures: u16 = 0;
 
         for id in 0..num_accounts {
-            accounts.insert(id, Mutex::new(0));
+            accounts.insert(id, Mutex::new(0.0));
         }
 
         let file: File = File::open(ledger_filepath).unwrap();
@@ -51,7 +50,7 @@ impl Bank {
             let mut tokens = line.splitn(4, ' ');
             let from_id: u16 = tokens.next().unwrap().parse::<u16>().unwrap();
             let to_id: u16 = tokens.next().unwrap().parse::<u16>().unwrap();
-            let amount: i32 = tokens.next().unwrap().parse::<i32>().unwrap();
+            let amount: f32 = tokens.next().unwrap().parse::<f32>().unwrap();
             let mode_id: u8 = tokens.next().unwrap().parse::<u8>().unwrap();
             let transaction: Transaction = Transaction::new(from_id, to_id, amount, mode_id);
             ledger.insert(id, transaction);
@@ -79,7 +78,7 @@ impl Bank {
     /// A success message if the deposit succeeds and a failure message
     /// otherwise
     pub fn deposit(thread_id: u16, transaction_id: u16, account_id: u16,
-                   amount: i32) -> String {
+                   amount: f32) -> String {
         todo!();
     }
 
@@ -95,7 +94,7 @@ impl Bank {
     /// A success message if the withdrawal succeeds and a failure message
     /// otherwise
     pub fn withdraw(thread_id: u16, transaction_id: u16, account_id: u16,
-        amount: i32) -> String {
+        amount: f32) -> String {
         todo!();
     }
 
@@ -115,7 +114,7 @@ impl Bank {
     /// A success message if the transfer succeeds and a failure message
     /// otherwise
     pub fn transfer(thread_id: u16, transfer: u16, from_id: u16,
-        to_id: u16, amount: i32) -> String {
+        to_id: u16, amount: f32) -> String {
         todo!();
     }
 
@@ -124,18 +123,6 @@ impl Bank {
     /// #### Parameters
     /// `id`: The identifier of the `Thread` processing the `Transaction`
     pub fn thread(id: u16) {
-        todo!();
-    }
-}
-
-impl Drop for Bank {
-    fn drop(&mut self) {
-        todo!();
-    }
-}
-
-impl Display for Bank {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         todo!();
     }
 }
