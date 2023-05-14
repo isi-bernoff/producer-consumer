@@ -1,25 +1,11 @@
 use std::collections::HashMap;
 use std::thread::Thread;
 use std::sync::Mutex;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::fmt::{Formatter, Display, Result};
-
-enum Kind {
-    Deposit,
-    Withdrawal,
-    Transfer
-}
-
-/// #### Fields:
-/// - `from_id`: The `u16` identifier of the account having its money removed
-/// - `to_id`: The `u16` identifier of the account having receiving money
-/// - `amount`: The `i32` amount of money being moved
-/// - `kind`: The `enum Kind` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
-struct Transaction {
-    from_id: u16,
-    to_id: u16,
-    amount: i32,
-    kind: Kind
-}
+use self::transaction::Transaction;
+mod transaction;
 
 /// #### Fields:
 /// - `threads`: A `HashMap` of `u16` identifiers to `Threads`
@@ -37,15 +23,15 @@ pub struct Bank {
 }
 
 impl Bank {
-    /// Constructs a new `Bank` object and initializes its `accounts`
+    /// Constructs a new `Bank` object and initializes its `accounts` and
     /// `ledger`
     /// #### Parameters
     /// - `num_accounts`: The number of `account`s to initialize
-    /// - `ledger_filename`: The name of a ledger file containing transactions
-    /// formatted `<from_id> <to_id> <amount> <mode>` on each line
-    /// ### Returns
+    /// - `ledger_filepath`: The name of a ledger file containing transactions
+    /// formatted `<from_id> <to_id> <amount> <mode_num>` on each line
+    /// #### Returns
     /// The new `Bank` object
-    pub fn new(num_accounts: u16, ledger_filename: String) -> Self {
+    pub fn new(num_accounts: u16, ledger_filepath: String) -> Self {
         let threads: HashMap<u16, Thread> = HashMap::new();
         let mut accounts: HashMap<u16, Mutex<i32>> = HashMap::new();
         let mut ledger: HashMap<u16, Transaction> = HashMap::new();
@@ -54,6 +40,21 @@ impl Bank {
 
         for id in 0..num_accounts {
             accounts.insert(id, Mutex::new(0));
+        }
+
+        let file: File = File::open(ledger_filepath).unwrap();
+        let reader: BufReader<File> = BufReader::new(file);
+        
+        for (id, line) in reader.lines().enumerate() {
+            let id: u16 = u16::try_from(id).unwrap();
+            let line: String = line.unwrap();
+            let mut tokens = line.splitn(4, ' ');
+            let from_id: u16 = tokens.next().unwrap().parse::<u16>().unwrap();
+            let to_id: u16 = tokens.next().unwrap().parse::<u16>().unwrap();
+            let amount: i32 = tokens.next().unwrap().parse::<i32>().unwrap();
+            let mode_id: u8 = tokens.next().unwrap().parse::<u8>().unwrap();
+            let transaction: Transaction = Transaction::new(from_id, to_id, amount, mode_id);
+            ledger.insert(id, transaction);
         }
 
         Self {threads, accounts, ledger, num_successes, num_failures}
@@ -71,13 +72,13 @@ impl Bank {
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the
     ///   deposit
-    /// - `deposit_id`: The identifier of the deposit `Transaction`
+    /// - `transaction_id`: The identifier of the deposit `Transaction`
     /// - `account_id`: The identifier of the account receiving the deposit
     /// - `amount`: The amount of money being deposited
     /// #### Returns
     /// A success message if the deposit succeeds and a failure message
     /// otherwise
-    pub fn deposit(thread_id: u16, deposit_id: u16, account_id: u16,
+    pub fn deposit(thread_id: u16, transaction_id: u16, account_id: u16,
                    amount: i32) -> String {
         todo!();
     }
@@ -87,13 +88,13 @@ impl Bank {
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the
     ///   withdrawal
-    /// - `withdrawal_id`: The identifier of the withdrawal `Transaction`
+    /// - `transaction_id`: The identifier of the withdrawal `Transaction`
     /// - `account_id`: The identifier of the account having the withdrawal
     /// - `amount`: The amount of money being withdrawn
     /// #### Returns
     /// A success message if the withdrawal succeeds and a failure message
     /// otherwise
-    pub fn withdraw(thread_id: u16, withdrawal_id: u16, account_id: u16,
+    pub fn withdraw(thread_id: u16, transaction_id: u16, account_id: u16,
         amount: i32) -> String {
         todo!();
     }
@@ -104,11 +105,11 @@ impl Bank {
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the
     ///   transfer
-    /// - `transfer_id`: The identifier of the transfer `Transaction`
+    /// - `transaction_id`: The identifier of the transfer `Transaction`
     /// - `from_id`: The identifier of the account having money transferred
     ///   from it
     /// - `to_id`: The identifier of the account having money transferred
-    ///   to it \
+    ///   to it
     /// - `amount`: The amount of money being withdrawn
     /// #### Returns
     /// A success message if the transfer succeeds and a failure message
@@ -119,8 +120,7 @@ impl Bank {
     }
 
     /// Pops a `Transaction` from the `Bank`'s `ledger` and uses a `Thread`
-    /// to process it
-    /// concurrently
+    /// to process it concurrently
     /// #### Parameters
     /// `id`: The identifier of the `Thread` processing the `Transaction`
     pub fn thread(id: u16) {
@@ -135,7 +135,7 @@ impl Drop for Bank {
 }
 
 impl Display for Bank {
-    fn fmt (&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         todo!();
     }
 }

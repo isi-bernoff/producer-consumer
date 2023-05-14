@@ -1,20 +1,14 @@
-#![crate_name = "multi_bank"]
+#![crate_name = "bank"]
 
 use std::env::args;
-use std::process::exit;
-use crate::bank::Bank;
+use bank::Bank;
 mod bank;
 
 fn main() {
     let args: Vec<String> = args().collect();
-    
-    if args.len() != 3 {
-        eprintln!("Usage: {} <num_threads> <ledger_filename>", args[0]);
-        exit(-1);
-    }
-
-    let num_threads: u16 = args[1].parse().unwrap();
-    let ledger_filename: String = args[2].clone();
-    let bank: Bank = Bank::new(10, ledger_filename);
+    let num_accounts: u16 = 10;
+    let ledger_filepath: String = args[2].parse::<String>().unwrap();
+    let bank: Bank = Bank::new(num_accounts, ledger_filepath);
+    let num_threads: u16 = args[1].parse::<u16>().unwrap();
     bank.init(num_threads);
 }
