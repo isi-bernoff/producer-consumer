@@ -27,9 +27,8 @@ impl Transaction {
     /// - `from_id`: The identifier of the account having its money removed
     /// - `to_id`: The identifier of the account receiving money
     /// - `amount`: The amount of money being moved
-    /// - `mode_id`: The identifier for the mode of the `Transaction`, where
-    ///   `0`, `1`, and `2` represent a deposit, withdrawal, or transfer,
-    ///   respectively.
+    /// - `mode_id`: The identifier for the mode of the `Transaction`, where `0`, `1`, and `2`
+    ///   represent a deposit, withdrawal, or transfer, respectively.
     /// #### Returns
     /// The new `Transaction` object
     pub fn new(from_id: u16, to_id: u16, amount: f32, mode_id: u8) -> Self {

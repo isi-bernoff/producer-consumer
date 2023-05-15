@@ -19,7 +19,7 @@ $ cargo run <num_threads> <ledger_filename>
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
 #### Fields
-- `threads`: A `HashMap` of `u16` identifiers to `Threads`
+- `join_handles`: A `HashMap` of `u16` identifiers to `Threads`s' `JoinHandle`s
 - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
 - `num_successes`: The `u16` number of `Transaction`s that succeeded
@@ -39,20 +39,29 @@ The new `Transaction` object
 ```rs
 Bank::new(num_accounts: u16, ledger_filepath: String) -> Bank
 ```
-Constructs a new `Bank` object and initializes its accounts, ledger, and numbers of successful and failed transactions
+Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successes`, and `num_failures`
 #### Parameters
 - `num_accounts`: The number of `account`s to initialize
 - `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode_id>` on each line
 #### Returns
 The new `Bank` object
 ```rs
-Bank::init(num_threads: u16)
+Bank::spawn(&mut self, num_threads: u16)
 ```
-Initializes this `Bank`'s `threads` and `ledger`
+Spawns `Threads` to initialize this `Bank`'s `join_handles`
 #### Parameters
-- `num_threads`: The number of `Thread`s to initialize
+- `num_threads`: The number of `Thread`s to spawn
 ```rs
-Bank::deposit(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> String
+pub fn perform_transaction(thread_id: u16) -> String
+```
+Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread` to process it concurrently
+#### Parameters
+`thread_id`: The identifier of the thread processing the `Transaction`
+#### Returns
+A success message if the `Transaction` succeeds and a failure message otherwise
+    
+```rs
+Bank::deposit(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing
 `num_successes` or `num_failures` depending on if the deposit works
@@ -62,8 +71,7 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
-A success message if the deposit succeeds and a failure message
-otherwise
+`true` if the deposit succeeds and `false` otherwise
 ```rs
 Bank::withdraw(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> String
 ```
@@ -74,8 +82,7 @@ Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successe
 - `account_id`: The identifier of the account having the withdrawal
 - `amount`: The amount of money being withdrawn
 #### Returns
-A success message if the withdrawal succeeds and a failure message
-otherwise
+`true` if the withdrawal succeeds and `false` otherwise
 ```rs
 Bank::transfer(thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: f32) -> String
 ```
@@ -89,10 +96,4 @@ transfer works
 - `to_id`: The identifier of the account having money transferred to it
 - `amount`: The amount of money being withdrawn
 #### Returns
-A success message if the transfer succeeds and a failure message otherwise
-```rs
-Bank::thread(id: u16)
-```
-Pops a `Transaction` from the `Bank`'s `ledger` and uses a `Thread` to process it concurrently
-#### Parameters
-- `id`: The identifier of the `Thread` processing the `Transaction`
+`true` if the transfer succeeds and `false` otherwise
