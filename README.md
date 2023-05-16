@@ -19,11 +19,11 @@ $ cargo run <num_threads> <ledger_filename>
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
 #### Fields
-- `join_handles`: A `HashMap` of `u16` identifiers to `Threads`s' `JoinHandle`s
-- `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `f32` balances
-- `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
-- `num_successes`: The `u16` number of `Transaction`s that succeeded
-- `num_failures`: The `u16` number of `Transaction`s that failed
+- `join_handles`: A `BTreeMap` of `u16` identifiers to `Threads`s' `JoinHandle`s
+- `accounts`: A `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
+- `ledger`: A `BTreeMap` of `u16` identifiers to `Transactions`
+- `num_successful`: The `u16` number of `Transaction`s that succeeded
+- `num_failed`: The `u16` number of `Transaction`s that failed
 ## Methods
 ```rs
 Transaction::new(from_id: u16, to_id: u16, amount: f32, mode_id: u8) -> Transaction
@@ -33,13 +33,13 @@ Constructs and initializes a new `Transaction` object
 - `from_id`: The identifier of the account having its money removed
 - `to_id`: The identifier of the account receiving money
 - `amount`: The amount of money being moved
-- `mode_id`: The identifier for the mode of the `Transaction`, where `0`, `1`, and `2` represent a deposit, withdrawal, or transfer, respectively.
+- `mode_id`: The identifier for the mode of the `Transaction`, where `0`, `1`, and `2` represent a deposit, withdrawal, or transfer, respectively
 #### Returns
 The new `Transaction` object
 ```rs
 Bank::new(num_accounts: u16, ledger_filepath: String) -> Bank
 ```
-Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successes`, and `num_failures`
+Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successful`, and `num_failed`
 #### Parameters
 - `num_accounts`: The number of `account`s to initialize
 - `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode_id>` on each line
@@ -52,7 +52,7 @@ Spawns `Threads` to initialize this `Bank`'s `join_handles`
 #### Parameters
 - `num_threads`: The number of `Thread`s to spawn
 ```rs
-pub fn perform_transaction(thread_id: u16) -> String
+pub fn perform_transaction(&mut self, thread_id: u16) -> String
 ```
 Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread` to process it concurrently
 #### Parameters
@@ -61,10 +61,10 @@ Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread` to process it 
 A success message if the `Transaction` succeeds and a failure message otherwise
     
 ```rs
-Bank::deposit(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
+Bank::deposit(&mut self, thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing
-`num_successes` or `num_failures` depending on if the deposit works
+`num_successful` or `num_failed` depending on if the deposit works
 #### Parameters
 - `thread_id`: The identifier of the `Thread` processing the the deposit
 - `transaction_id`: The identifier of the deposit `Transaction`
@@ -73,9 +73,9 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 #### Returns
 `true` if the deposit succeeds and `false` otherwise
 ```rs
-Bank::withdraw(thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> String
+Bank::withdraw(&mut self, thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
 ```
-Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successes` or `num_failures` depending on if the withdrawal works
+Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successful` or `num_failed` depending on if the withdrawal works
 #### Parameters
 - `thread_id`: The identifier of the `Thread` processing the the withdrawal
 - `transaction_id`: The identifier of the withdrawal `Transaction`
@@ -84,16 +84,16 @@ Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successe
 #### Returns
 `true` if the withdrawal succeeds and `false` otherwise
 ```rs
-Bank::transfer(thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: f32) -> String
+Bank::transfer(&mut self, thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
 Transfers money from one of this `Bank`'s `accounts` to another,
-incrementing `num_successes` or `num_failures` depending on if the
+incrementing `num_successful` or `num_failed` depending on if the
 transfer works
 #### Parameters
 - `thread_id`: The identifier of the `Thread` processing the the transfer
 - `transaction_id`: The identifier of the transfer `Transaction`
 - `from_id`: The identifier of the account having money transferred from it
 - `to_id`: The identifier of the account having money transferred to it
-- `amount`: The amount of money being withdrawn
+- `amount`: The amount of money being transferred
 #### Returns
 `true` if the transfer succeeds and `false` otherwise

@@ -11,5 +11,5 @@ fn main() {
     let mut bank: Bank = Bank::new(num_accounts, ledger_filepath);
     let num_threads: u16 = args[1].parse::<u16>().unwrap();
 
-    bank.spawn(num_threads);
+    println!("{}", bank);
 }

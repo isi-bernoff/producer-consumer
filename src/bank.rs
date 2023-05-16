@@ -1,29 +1,30 @@
-use std::collections::HashMap;
-use std::thread::{JoinHandle, spawn};
+use std::collections::{BTreeMap};
+use std::thread::{JoinHandle};
 use std::sync::Mutex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::fmt::{Display, Formatter, Result};
 use self::transaction::Transaction;
 mod transaction;
 
 /// #### Fields:
-/// - `join_handles`: A `HashMap` of `u16` identifiers to `String` messages returned from
+/// - `join_handles`: A `BTreeMap` of `u16` identifiers to `String` messages returned from
 ///   `Threads`s' `JoinHandle`s
-/// - `accounts`: A `HashMap` of `u16` identifiers to `Mutex`-locked `f32` balances
-/// - `ledger`: A `HashMap` of `u16` identifiers to `Transactions`
-/// - `num_successes`: The `u16` number of `Transaction`s that succeeded
-/// - `num_failures`: The `u16` number of `Transaction`s that failed
+/// - `accounts`: A `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
+/// - `ledger`: A `BTreeMap` of `Transactions`
+/// - `num_successful`: The `u16` number of `Transaction`s that succeeded
+/// - `num_failed`: The `u16` number of `Transaction`s that failed
 pub struct Bank {
-    join_handles: HashMap<u16, JoinHandle<String>>,
-    accounts: HashMap<u16, Mutex<f32>>,
-    ledger: HashMap<u16, Transaction>,
-    num_successes: u16,
-    num_failures: u16
+    join_handles: BTreeMap<u16, JoinHandle<String>>,
+    accounts: BTreeMap<u16, Mutex<f32>>,
+    ledger: BTreeMap<u16, Transaction>,
+    num_successful: u16,
+    num_failed: u16
 }
 
 impl Bank {
-    /// Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successes`,
-    /// and `num_failures`
+    /// Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successful`,
+    /// and `num_failed`
     /// #### Parameters
     /// - `num_accounts`: The number of `account`s to initialize
     /// - `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id>
@@ -31,11 +32,11 @@ impl Bank {
     /// #### Returns
     /// The new `Bank` object
     pub fn new(num_accounts: u16, ledger_filepath: String) -> Self {
-        let join_handles: HashMap<u16, JoinHandle<String>> = HashMap::new();
-        let mut accounts: HashMap<u16, Mutex<f32>> = HashMap::new();
-        let mut ledger: HashMap<u16, Transaction> = HashMap::new();
-        let num_successes: u16 = 0;
-        let num_failures: u16 = 0;
+        let join_handles: BTreeMap<u16, JoinHandle<String>> = BTreeMap::new();
+        let mut accounts: BTreeMap<u16, Mutex<f32>> = BTreeMap::new();
+        let mut ledger: BTreeMap<u16, Transaction> = BTreeMap::new();
+        let num_successful: u16 = 0;
+        let num_failed: u16 = 0;
 
         for id in 0u16..num_accounts {
             let mutex: Mutex<f32> = Mutex::new(0.0);
@@ -54,37 +55,30 @@ impl Bank {
             let amount: f32 = tokens.next().unwrap().parse::<f32>().unwrap();
             let mode_id: u8 = tokens.next().unwrap().parse::<u8>().unwrap();
             let transaction: Transaction = Transaction::new(from_id, to_id, amount, mode_id);
+            
             ledger.insert(id, transaction);
         }
 
-        Self {join_handles, accounts, ledger, num_successes, num_failures}
+        Self {join_handles, accounts, ledger, num_successful, num_failed}
     }
     
     /// Spawns `Threads` to initialize this `Bank`'s `join_handles`
     /// #### Parameters
     /// - `num_threads`: The number of `Thread`s to spawn
     pub fn spawn(&mut self, num_threads: u16) {
-        for id in 0u16..num_threads {
-            let join_handle: JoinHandle<String> = spawn(move || {
-                let thread_id: u16 = id;
-                return Self::perform_transaction(thread_id);
-            });
-            self.join_handles.insert(id, join_handle);
-        }
+        todo!();
     }
 
     /// Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread`
     /// to process it concurrently
-    /// #### Parameters
-    /// `thread_id`: The identifier of the thread processing the `Transaction`
     /// #### Returns
     /// A success message if the `Transaction` succeeds and a failure message otherwise
-    pub fn perform_transaction(thread_id: u16) -> String {
+    pub fn perform_transaction(&mut self) -> String {
         todo!();
     }
     
     /// Deposit money into one of this `Bank`'s `accounts`, incrementing
-    /// `num_successes` or `num_failures` depending on if the deposit works
+    /// `num_successful` or `num_failed` depending on if the deposit works
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the deposit
     /// - `transaction_id`: The identifier of the deposit `Transaction`
@@ -98,7 +92,7 @@ impl Bank {
     }
 
     /// Withdraws money from one of this `Bank`'s `accounts`, incrementing
-    /// `num_successes` or `num_failures` depending on if the withdrawal works
+    /// `num_successful` or `num_failed` depending on if the withdrawal works
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the withdrawal
     /// - `transaction_id`: The identifier of the withdrawal `Transaction`
@@ -112,18 +106,34 @@ impl Bank {
     }
 
     /// Transfers money from one of this `Bank`'s `accounts` to another,
-    /// incrementing `num_successes` or `num_failures` depending on if the
+    /// incrementing `num_successful` or `num_failed` depending on if the
     /// transfer works
     /// #### Parameters
     /// - `thread_id`: The identifier of the `Thread` processing the the transfer
     /// - `transaction_id`: The identifier of the transfer `Transaction`
     /// - `from_id`: The identifier of the account having money transferred from it
     /// - `to_id`: The identifier of the account having money transferred to it
-    /// - `amount`: The amount of money being withdrawn
+    /// - `amount`: The amount of money being transferred
     /// #### Returns
     /// `true` if the transfer succeeds and `false` otherwise
     pub fn transfer(&self, thread_id: u16, transfer: u16, from_id: u16,
         to_id: u16, amount: f32) -> bool {
         todo!();
+    }
+}
+
+impl Display for Bank {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> Result {
+        write!(formatter, "Bank\n")?;
+
+        for (id, mutex) in &self.accounts {
+            let id: u16 = *id;
+            let balance: f32 = *mutex.lock().unwrap();
+
+            write!(formatter, " - Account {:05}: ${:.2}\n", id, balance)?;
+        }
+
+        write!(formatter, "Transactions\n - Successful: {}\n - Failed: {}",
+               self.num_successful, self.num_failed)
     }
 }
