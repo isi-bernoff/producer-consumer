@@ -13,15 +13,16 @@ $ cargo run <num_threads> <ledger_filename>
 ## Structures
 ### `Transaction`
 #### Fields
+- `id`: The `u16` identifier for this `Transaction`
 - `from_id`: The `u16` identifier of the account having its money removed
 - `to_id`: The `u16` identifier of the account having receiving money
 - `amount`: The `f32` amount of money being moved
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
 #### Fields
-- `join_handles`: A `BTreeMap` of `u16` identifiers to `Threads`s' `JoinHandle`s
-- `accounts`: A `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
-- `ledger`: A `BTreeMap` of `u16` identifiers to `Transactions`
+- `join_handles`: A `Vec` of `Thread`s' `JoinHandle`s that return `String` success or failure messages
+- `accounts`: `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
+- `ledger`: A `Vec` of `Transactions`
 - `num_successful`: The `u16` number of `Transaction`s that succeeded
 - `num_failed`: The `u16` number of `Transaction`s that failed
 ## Methods
@@ -30,6 +31,7 @@ Transaction::new(from_id: u16, to_id: u16, amount: f32, mode_id: u8) -> Transact
 ```
 Constructs and initializes a new `Transaction` object
 #### Parameters
+- `id`: The identifier for the new `Transaction` object
 - `from_id`: The identifier of the account having its money removed
 - `to_id`: The identifier of the account receiving money
 - `amount`: The amount of money being moved
@@ -46,52 +48,45 @@ Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_su
 #### Returns
 The new `Bank` object
 ```rs
-Bank::spawn(&mut self, num_threads: u16)
+Bank::start(&mut self, num_threads: u16)
 ```
-Spawns `Threads` to initialize this `Bank`'s `join_handles`
+Spawns `Threads` to process this `Bank`'s `ledger` concurrently
 #### Parameters
 - `num_threads`: The number of `Thread`s to spawn
 ```rs
-pub fn perform_transaction(&mut self, thread_id: u16) -> String
+Bank::process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16)
 ```
 Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread` to process it concurrently
 #### Parameters
-`thread_id`: The identifier of the thread processing the `Transaction`
-#### Returns
-A success message if the `Transaction` succeeds and a failure message otherwise
-    
+- `arc_bank`: Atomic reference to this `Bank`
+- `thread_id`: The identifier of the thread processing the `Transaction` 
 ```rs
-Bank::deposit(&mut self, thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
+Bank::deposit(&mut self, thread_id: u16, account_id: u16, amount: f32) -> bool
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing
 `num_successful` or `num_failed` depending on if the deposit works
 #### Parameters
 - `thread_id`: The identifier of the `Thread` processing the the deposit
-- `transaction_id`: The identifier of the deposit `Transaction`
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
 `true` if the deposit succeeds and `false` otherwise
 ```rs
-Bank::withdraw(&mut self, thread_id: u16, transaction_id: u16, account_id: u16, amount: f32) -> bool
+Bank::withdraw(&mut self, thread_id: u16, account_id: u16, amount: f32) -> bool
 ```
 Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successful` or `num_failed` depending on if the withdrawal works
 #### Parameters
-- `thread_id`: The identifier of the `Thread` processing the the withdrawal
-- `transaction_id`: The identifier of the withdrawal `Transaction`
 - `account_id`: The identifier of the account having the withdrawal
 - `amount`: The amount of money being withdrawn
 #### Returns
 `true` if the withdrawal succeeds and `false` otherwise
 ```rs
-Bank::transfer(&mut self, thread_id: u16, transfer: u16, from_id: u16, to_id: u16, amount: f32) -> bool
+Bank::transfer(&mut self, thread_id: u16, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
 Transfers money from one of this `Bank`'s `accounts` to another,
 incrementing `num_successful` or `num_failed` depending on if the
 transfer works
 #### Parameters
-- `thread_id`: The identifier of the `Thread` processing the the transfer
-- `transaction_id`: The identifier of the transfer `Transaction`
 - `from_id`: The identifier of the account having money transferred from it
 - `to_id`: The identifier of the account having money transferred to it
 - `amount`: The amount of money being transferred
