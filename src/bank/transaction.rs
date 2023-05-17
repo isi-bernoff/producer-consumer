@@ -56,7 +56,7 @@ impl Display for Transaction {
                                     "Transaction {:05}: Withdrawal of ${:.2} from Account {:05}",
                                     self.id, self.amount, self.from_id),
             Mode::Transfer => write!(formatter,
-                                    "Transaction {:05} Transfer of ${:.2} from Account {:05} to Account {:05}",
+                                    "Transaction {:05}: Transfer of ${:.2} from Account {:05} to Account {:05}",
                                     self.id, self.amount, self.from_id, self.to_id)
         }
     }

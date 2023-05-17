@@ -58,10 +58,10 @@ Bank::process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16)
 ```
 Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread` to process it concurrently
 #### Parameters
-- `arc_bank`: Atomic reference to this `Bank`
+- `arc_bank`: Atomic reference to this `Mutex`-guarded `Bank`
 - `thread_id`: The identifier of the thread processing the `Transaction` 
 ```rs
-Bank::deposit(&mut self, thread_id: u16, account_id: u16, amount: f32) -> bool
+Bank::deposit(&mut self, account_id: u16, amount: f32) -> bool
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing
 `num_successful` or `num_failed` depending on if the deposit works
@@ -72,16 +72,16 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 #### Returns
 `true` if the deposit succeeds and `false` otherwise
 ```rs
-Bank::withdraw(&mut self, thread_id: u16, account_id: u16, amount: f32) -> bool
+Bank::withdraw(&mut self, account_id: u16, amount: f32) -> bool
 ```
 Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_successful` or `num_failed` depending on if the withdrawal works
 #### Parameters
-- `account_id`: The identifier of the account having the withdrawal
+- `account_id`: The identifier of the account having its money withdrawn
 - `amount`: The amount of money being withdrawn
 #### Returns
 `true` if the withdrawal succeeds and `false` otherwise
 ```rs
-Bank::transfer(&mut self, thread_id: u16, from_id: u16, to_id: u16, amount: f32) -> bool
+Bank::transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
 Transfers money from one of this `Bank`'s `accounts` to another,
 incrementing `num_successful` or `num_failed` depending on if the
@@ -92,3 +92,5 @@ transfer works
 - `amount`: The amount of money being transferred
 #### Returns
 `true` if the transfer succeeds and `false` otherwise
+
+##### Thanks to recent UMass MS graduate [Ryan Lee](https://github.com/rlee287) for ~~guarding~~ guiding me through the idiosyncrasies of Rust.

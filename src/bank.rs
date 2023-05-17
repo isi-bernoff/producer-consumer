@@ -63,8 +63,10 @@ impl Bank {
     /// - `num_threads`: The number of `Thread`s to spawn
     pub fn start(self, num_threads: u16) {
         println!("{}", &self);
-        let mut arc_bank = Arc::new(Mutex::new(self));
+        let arc_bank = Arc::new(Mutex::new(self));
         let mut join_handles: Vec<JoinHandle<()>> = Vec::new();
+
+        println!("Threads");
 
         for id in 0u16..num_threads {
             let arc_bank = Arc::clone(&arc_bank);
@@ -95,9 +97,9 @@ impl Bank {
 
         while !(*bank).ledger.is_empty() {
             let transaction: Transaction = bank.ledger.pop().unwrap();
-            let success_message: String = format!("Thread {:05} successfully processed {}",
+            let success_message: String = format!(" - Thread {:05} successfully processed {}",
                                                   thread_id, transaction);
-            let failure_message: String = format!("Thread {:05} failed to process {}",
+            let failure_message: String = format!(" - Thread {:05} failed to process {}",
                                                   thread_id, transaction);
 
             match transaction.mode {
@@ -133,20 +135,28 @@ impl Bank {
     /// - `amount`: The amount of money being deposited
     /// #### Returns
     /// `true` if the deposit succeeds and `false` otherwise
-    pub fn deposit(&self, account_id: u16, amount: f32) -> bool {
-        todo!();
+    pub fn deposit(&mut self, account_id: u16, amount: f32) -> bool {
+        *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() += amount;
+        self.num_successful += 1;
+        return true;
     }
 
     /// Withdraws money from one of this `Bank`'s `accounts`, incrementing
     /// `num_successful` or `num_failed` depending on if the withdrawal works
     /// #### Parameters
-    /// - `account_id`: The identifier of the account having the withdrawal
+    /// - `account_id`: The identifier of the account having its withdrawal
     /// - `amount`: The amount of money being withdrawn
     /// #### Returns
     /// `true` if the withdrawal succeeds and `false` otherwise
-    pub fn withdraw(&self, account_id: u16,
-        amount: f32) -> bool {
-        todo!();
+    pub fn withdraw(&mut self, account_id: u16, amount: f32) -> bool {
+        if amount > *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() {
+            self.num_failed += 1;
+            return false;
+        }
+
+        *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() -= amount;
+        self.num_successful += 1;
+        return true;
     }
 
     /// Transfers money from one of this `Bank`'s `accounts` to another,
@@ -158,8 +168,21 @@ impl Bank {
     /// - `amount`: The amount of money being transferred
     /// #### Returns
     /// `true` if the transfer succeeds and `false` otherwise
-    pub fn transfer(&self, from_id: u16, to_id: u16, amount: f32) -> bool {
-        todo!();
+    pub fn transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool {
+        if from_id == to_id {
+            self.num_failed += 1;
+            return false;
+        }
+
+        if amount > *self.accounts.get_mut(&from_id).unwrap().lock().unwrap() {
+            self.num_failed += 1;
+            return false;
+        }
+
+        *self.accounts.get_mut(&from_id).unwrap().lock().unwrap() -= amount;
+        *self.accounts.get_mut(&to_id).unwrap().lock().unwrap() += amount;
+        self.num_successful += 1;
+        return true;
     }
 }
 
@@ -167,9 +190,9 @@ impl Display for Bank {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> Result {
         write!(formatter, "Bank\n")?;
 
-        for (id, mutex) in &self.accounts {
+        for (id, balance) in &self.accounts {
             let id: u16 = *id;
-            let balance: f32 = *mutex.lock().unwrap();
+            let balance: f32 = *balance.lock().unwrap();
 
             write!(formatter, " - Account {}: ${:.2}\n", id, balance)?;
         }
