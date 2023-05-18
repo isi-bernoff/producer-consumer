@@ -10,19 +10,19 @@ mod transaction;
 /// #### Fields:
 /// - `accounts`: `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 /// - `ledger`: A `Vec` of `Transactions`
-/// - `num_successful`: The `u16` number of `Transaction`s that succeeded
-/// - `num_failed`: The `u16` number of `Transaction`s that failed
+/// - `num_transactions`: The `u16` number of `Transaction`s in the `ledger`
+/// - `num_succeeded`: The `u16` number of `Transaction`s that succeeded
 #[derive(Debug)]
 pub struct Bank {
     accounts: BTreeMap<u16, Mutex<f32>>,
     ledger: Vec<Transaction>,
-    num_successful: u16,
-    num_failed: u16
+    num_transactions: u16,
+    num_succeeded: u16
 }
 
 impl Bank {
-    /// Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successful`,
-    /// and `num_failed`
+    /// Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_transactions`,
+    /// and `num_succeeded`
     /// #### Parameters
     /// - `num_accounts`: The number of `account`s to initialize
     /// - `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id>
@@ -32,8 +32,6 @@ impl Bank {
     pub fn new(num_accounts: u16, ledger_filepath: String) -> Self {
         let mut accounts: BTreeMap<u16, Mutex<f32>> = BTreeMap::new();
         let mut ledger: Vec<Transaction> = Vec::new();
-        let num_successful: u16 = 0;
-        let num_failed: u16 = 0;
 
         for id in 0u16..num_accounts {
             let mutex: Mutex<f32> = Mutex::new(0.0);
@@ -55,7 +53,10 @@ impl Bank {
             ledger.push(Transaction::new(id, from_id, to_id, amount, mode_id));
         }
 
-        Self {accounts, ledger, num_successful, num_failed}
+        let num_transactions: u16 = u16::try_from(ledger.len()).unwrap();
+        let num_succeeded: u16 = 0;
+
+        Self {accounts, ledger, num_transactions, num_succeeded}
     }
     
     /// Spawns `Threads` to process this `Bank`'s `ledger` concurrently
@@ -90,8 +91,6 @@ impl Bank {
     /// #### Parameters
     /// - `arc_bank`: The atomic reference to this `Mutex`-locked `Bank`
     /// - `thread_id`: The identifier of the thread processing the `Transaction`
-    /// #### Returns
-    /// A success message if the `Transaction` succeeds and a failure message otherwise
     pub fn process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16) {
         let mut bank = arc_bank.lock().unwrap();
 
@@ -128,8 +127,8 @@ impl Bank {
         }
     }
     
-    /// Deposit money into one of this `Bank`'s `accounts`, incrementing
-    /// `num_successful` or `num_failed` depending on if the deposit works
+    /// Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
+    /// deposit worked
     /// #### Parameters
     /// - `account_id`: The identifier of the account receiving the deposit
     /// - `amount`: The amount of money being deposited
@@ -137,31 +136,29 @@ impl Bank {
     /// `true` if the deposit succeeds and `false` otherwise
     pub fn deposit(&mut self, account_id: u16, amount: f32) -> bool {
         *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() += amount;
-        self.num_successful += 1;
+        self.num_succeeded += 1;
         return true;
     }
 
-    /// Withdraws money from one of this `Bank`'s `accounts`, incrementing
-    /// `num_successful` or `num_failed` depending on if the withdrawal works
+    /// Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
+    /// withdrawal worked
     /// #### Parameters
-    /// - `account_id`: The identifier of the account having its withdrawal
+    /// - `account_id`: The identifier of the account having its money withdrawn
     /// - `amount`: The amount of money being withdrawn
     /// #### Returns
     /// `true` if the withdrawal succeeds and `false` otherwise
     pub fn withdraw(&mut self, account_id: u16, amount: f32) -> bool {
         if amount > *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() {
-            self.num_failed += 1;
             return false;
         }
 
         *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() -= amount;
-        self.num_successful += 1;
+        self.num_succeeded += 1;
         return true;
     }
 
-    /// Transfers money from one of this `Bank`'s `accounts` to another,
-    /// incrementing `num_successful` or `num_failed` depending on if the
-    /// transfer works
+    /// Transfers money from one of this `Bank`'s `accounts` to another, incrementing
+    /// `num_succeeded` if the transfer worked
     /// #### Parameters
     /// - `from_id`: The identifier of the account having money transferred from it
     /// - `to_id`: The identifier of the account having money transferred to it
@@ -170,18 +167,17 @@ impl Bank {
     /// `true` if the transfer succeeds and `false` otherwise
     pub fn transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool {
         if from_id == to_id {
-            self.num_failed += 1;
             return false;
         }
 
         if amount > *self.accounts.get_mut(&from_id).unwrap().lock().unwrap() {
-            self.num_failed += 1;
+            self.num_succeeded += 1;
             return false;
         }
 
         *self.accounts.get_mut(&from_id).unwrap().lock().unwrap() -= amount;
         *self.accounts.get_mut(&to_id).unwrap().lock().unwrap() += amount;
-        self.num_successful += 1;
+        self.num_succeeded += 1;
         return true;
     }
 }
@@ -194,19 +190,15 @@ impl Display for Bank {
             let id: u16 = *id;
             let balance: f32 = *balance.lock().unwrap();
 
-            write!(formatter, " - Account {}: ${:.2}\n", id, balance)?;
+            write!(formatter, " - Account {:05}: ${:.2}\n", id, balance)?;
         }
 
-        if !self.ledger.is_empty() {
-            write!(formatter, "Ledger\n")?;
-        }
+        write!(formatter, "Ledger: {}/{} transactions succeeded\n",
+               self.num_succeeded, self.num_transactions)?;
 
         for transaction in &self.ledger {
-            let transaction: Transaction = *transaction;
             write!(formatter, " - {}\n", transaction)?;
         }
-
-        write!(formatter, "Transactions\n - Successful: {}\n - Failed: {}",
-               self.num_successful, self.num_failed)
+        Ok(())
     }
 }

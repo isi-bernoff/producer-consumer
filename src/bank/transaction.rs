@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub enum Mode {
     Deposit,
     Withdrawal,
@@ -14,7 +14,7 @@ pub enum Mode {
 /// - `amount`: The `i32` amount of money being moved
 /// - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or
 ///   `Transfer`
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct Transaction {
     pub id: u16,
     pub from_id: u16,
