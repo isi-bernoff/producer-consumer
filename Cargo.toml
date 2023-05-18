@@ -3,5 +3,5 @@ name = "bank"
 version = "0.1.0"
 rust-version = "1.65.0"
 authors = ["Isi Bernoff <ibernoff@umass.edu>", "Dave Dirnfeld <ddirnfeld@umass.edu>", "Calvin Chai <kchai@umass.edu>"]
-description = "This project is a reconstruction of UMass's Operating Systems TAs Dave Dirnfield and Calvin Chai's C/C++ Producer/Consumers project into Rust. It is a banking application that uses threads to process transactions from a ledger file concurrently."
+description = "This project is a recreation of UMass's Operating Systems TAs Dave Dirnfield and Calvin Chai's C/C++ Producer/Consumers project into Rust. It is a banking application that uses threads to process transactions from a ledger file concurrently."
 edition = "2021"

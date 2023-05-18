@@ -1,5 +1,5 @@
 # Bank
-This project is a reconstruction of [UMass](https://www.umass.edu)'s [Operating Systems](https://www.cics.umass.edu/content/spring-23-course-descriptions#377) TAs [Dave Dirnfield](https://github.com/dd2912) and [Calvin Chai](https://github.com/NightDawnEX)'s C/C++ [Producer/Consumer](https://github.com/umass-cs-377/umass-cs-377.github.io/blob/a18ded192a18bc59affecb8ef077849617b3a61d/docs/04-projects/04-prodcon/index.md) project into [Rust](https://www.https://www.rust-lang.org). It is a banking application that uses threads to process transactions from a ledger file concurrently.
+This project is a recreation of [UMass](https://www.umass.edu)'s [Operating Systems](https://www.cics.umass.edu/content/spring-23-course-descriptions#377) TAs [Dave Dirnfield](https://github.com/dd2912) and [Calvin Chai](https://github.com/NightDawnEX)'s C/C++ [Producer/Consumer](https://github.com/umass-cs-377/umass-cs-377.github.io/blob/a18ded192a18bc59affecb8ef077849617b3a61d/docs/04-projects/04-prodcon/index.md) project into [Rust](https://www.https://www.rust-lang.org). It is a banking application that uses threads to process transactions from a ledger file concurrently.
 ## Prerequisites
 Rust 1.65.0+
 ## Execution
@@ -48,6 +48,7 @@ Bank::start(&mut self, num_threads: u16)
 Spawns `Threads` to process this `Bank`'s `ledger` concurrently
 #### Parameters
 - `num_threads`: The number of `Thread`s to spawn
+- `arc_bank`: The atomic reference counter to this `Mutex`-locked `Bank`
 ```rs
 Bank::process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16)
 ```
