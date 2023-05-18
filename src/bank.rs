@@ -8,7 +8,7 @@ use self::transaction::{Mode, Transaction};
 mod transaction;
 
 /// #### Fields:
-/// - `accounts`: `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
+/// - `accounts`: A `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 /// - `ledger`: A `Vec` of `Transactions`
 /// - `num_transactions`: The `u16` number of `Transaction`s in the `ledger`
 /// - `num_succeeded`: The `u16` number of `Transaction`s that succeeded
@@ -86,7 +86,7 @@ impl Bank {
         println!("{}", *arc_bank.lock().unwrap());
     }
 
-    /// Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread`
+    /// Pops a `Transaction` from this `Bank`'s `ledger` and uses a `Thread`
     /// to process it concurrently
     /// #### Parameters
     /// - `arc_bank`: The atomic reference counter to this `Mutex`-locked `Bank`
@@ -128,7 +128,7 @@ impl Bank {
     }
     
     /// Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
-    /// deposit worked
+    /// deposit succeeded
     /// #### Parameters
     /// - `account_id`: The identifier of the account receiving the deposit
     /// - `amount`: The amount of money being deposited
@@ -141,7 +141,7 @@ impl Bank {
     }
 
     /// Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
-    /// withdrawal worked
+    /// withdrawal succeeded
     /// #### Parameters
     /// - `account_id`: The identifier of the account having its money withdrawn
     /// - `amount`: The amount of money being withdrawn
@@ -158,7 +158,7 @@ impl Bank {
     }
 
     /// Transfers money from one of this `Bank`'s `accounts` to another, incrementing
-    /// `num_succeeded` if the transfer worked
+    /// `num_succeeded` if the transfer succeeded
     /// #### Parameters
     /// - `from_id`: The identifier of the account having money transferred from it
     /// - `to_id`: The identifier of the account having money transferred to it

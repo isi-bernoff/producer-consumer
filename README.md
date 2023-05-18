@@ -16,7 +16,7 @@ $ cargo run <num_threads> <ledger_filepath>
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
 #### Fields:
-- `accounts`: `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
+- `accounts`: A `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 - `ledger`: A `Vec` of `Transactions`
 - `num_transactions`: The `u16` number of `Transaction`s in the `ledger`
 - `num_succeeded`: The `u16` number of `Transaction`s that succeeded
@@ -54,13 +54,10 @@ Spawns `Threads` to process this `Bank`'s `ledger` concurrently
 ```rs
 Bank::process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16)
 ```
-Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
-deposit succeeded
+Pops a `Transaction` from this `Bank`'s `ledger` and uses a `Thread` to process it concurrently
 #### Parameters
-- `account_id`: The identifier of the account receiving the deposit
-- `amount`: The amount of money being deposited
-#### Returns
-`true` if the deposit succeeded and`false` otherwise
+- `arc_bank`: The atomic reference counter to this `Mutex`-locked `Bank`
+- `thread_id`: The identifier of the thread processing the `Transaction`
 ```rs
 Bank::deposit(&mut self, account_id: u16, amount: f32) -> bool
 ```
@@ -90,4 +87,4 @@ Transfers money from one of this `Bank`'s `accounts` to another, incrementing `n
 #### Returns
 `true` if the transfer succeeded and`false` otherwise
 
-##### Thanks to recent UMass MS graduate [Ryan Lee](https://github.com/rlee287) for ~~guarding~~ guiding me through the idiosyncrasies of Rust.
+###### Thanks to recent UMass MS graduate [Ryan Lee](https://github.com/rlee287) for ~~guarding~~ guiding me through the idiosyncrasies of Rust.
