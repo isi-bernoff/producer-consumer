@@ -10,12 +10,12 @@ $ cargo run <num_threads> <ledger_filepath>
 ### `Transaction`
 #### Fields
 - `id`: The `u16` identifier for this `Transaction`
-- `from_id`: The `u16` identifier of the account having its money removed
-- `to_id`: The `u16` identifier of the account having receiving money
+- `from_id`: The `u16` identifier of the account having its money moved
+- `to_id`: The `u16` identifier of the account receiving money
 - `amount`: The `f32` amount of money being moved
 - `mode`: The `enum Mode` of transaction, a `Deposit`, `Withdrawal`, or `Transfer`
 ### `Bank`
-#### Fields
+#### Fields:
 - `accounts`: `BTreeMap` of `u16` identifiers to `Mutex`-locked `f32` balances
 - `ledger`: A `Vec` of `Transactions`
 - `num_transactions`: The `u16` number of `Transaction`s in the `ledger`
@@ -24,22 +24,24 @@ $ cargo run <num_threads> <ledger_filepath>
 ```rs
 Transaction::new(from_id: u16, to_id: u16, amount: f32, mode_id: u8) -> Transaction
 ```
-Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_transactions`, and `num_succeeded`
+Constructs and initializes a new `Transaction` object
 #### Parameters
-- `num_accounts`: The number of `account`s to initialize
-- `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id>
-  <to_id> <amount> <mode_num>` on each line
-#### Returns
-The new `Bank` object
+- `id`: The identifier for the new `Transaction` object
+- `from_id`: The identifier of the account having its money moved
+- `to_id`: The identifier of the account receiving money
+- `amount`: The amount of money being moved
+- `mode_id`: The identifier for the mode of the `Transaction`, where `0`, `1`, and `2`
+  represent a deposit, withdrawal, or transfer, respectively.
 #### Returns
 The new `Transaction` object
 ```rs
 Bank::new(num_accounts: u16, ledger_filepath: String) -> Bank
 ```
-Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_successful`, and `num_failed`
+Constructs a new `Bank` object and initializes its `accounts`, `ledger`, `num_transactions`,
+and `num_succeeded`
 #### Parameters
 - `num_accounts`: The number of `account`s to initialize
-- `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode_id>` on each line
+- `ledger_filepath`: The name of a ledger file containing transactions formatted `<from_id> <to_id> <amount> <mode_num>` on each line
 #### Returns
 The new `Bank` object
 ```rs
@@ -58,7 +60,7 @@ deposit worked
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
-`true` if the deposit succeeds and `false` otherwise
+`true` if the deposit succeeded and`false` otherwise
 ```rs
 Bank::deposit(&mut self, account_id: u16, amount: f32) -> bool
 ```
@@ -69,27 +71,25 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
-`true` if the deposit succeeds and `false` otherwise
+`true` if the deposit succeeded and`false` otherwise
 ```rs
 Bank::withdraw(&mut self, account_id: u16, amount: f32) -> bool
 ```
-Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
-withdrawal worked
+Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the withdrawal worked
 #### Parameters
 - `account_id`: The identifier of the account having its money withdrawn
 - `amount`: The amount of money being withdrawn
 #### Returns
-`true` if the withdrawal succeeds and `false` otherwise
+`true` if the withdrawal succeeded and`false` otherwise
 ```rs
 Bank::transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
-Transfers money from one of this `Bank`'s `accounts` to another, incrementing
-`num_succeeded` if the transfer worked
+Transfers money from one of this `Bank`'s `accounts` to another, incrementing `num_succeeded` if the transfer worked
 #### Parameters
 - `from_id`: The identifier of the account having money transferred from it
 - `to_id`: The identifier of the account having money transferred to it
 - `amount`: The amount of money being transferred
 #### Returns
-`true` if the transfer succeeds and `false` otherwise
+`true` if the transfer succeeded and`false` otherwise
 
 ##### Thanks to recent UMass MS graduate [Ryan Lee](https://github.com/rlee287) for ~~guarding~~ guiding me through the idiosyncrasies of Rust.
