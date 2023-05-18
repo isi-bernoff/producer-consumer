@@ -64,15 +64,12 @@ deposit worked
 ```rs
 Bank::deposit(&mut self, account_id: u16, amount: f32) -> bool
 ```
-Deposit money into one of this `Bank`'s `accounts`, incrementing
-`num_successful` or `num_failed` depending on if the deposit works
+Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the deposit worked
 #### Parameters
-- `thread_id`: The identifier of the `Thread` processing the the deposit
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
 `true` if the deposit succeeded and`false` otherwise
-```rs
 Bank::withdraw(&mut self, account_id: u16, amount: f32) -> bool
 ```
 Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the withdrawal worked
