@@ -27,7 +27,7 @@ impl Transaction {
     /// Constructs and initializes a new `Transaction` object
     /// #### Parameters
     /// - `id`: The identifier for the new `Transaction` object
-    /// - `from_id`: The identifier of the account having its money removed
+    /// - `from_id`: The identifier of the account having its money moved
     /// - `to_id`: The identifier of the account receiving money
     /// - `amount`: The amount of money being moved
     /// - `mode_id`: The identifier for the mode of the `Transaction`, where `0`, `1`, and `2`
