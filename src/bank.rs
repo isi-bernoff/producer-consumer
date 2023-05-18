@@ -190,15 +190,15 @@ impl Display for Bank {
             let id: u16 = *id;
             let balance: f32 = *balance.lock().unwrap();
 
-            write!(formatter, " - Account {}: ${:.2}\n", id, balance)?;
+            write!(formatter, " - Account {:05}: ${:.2}\n", id, balance)?;
         }
 
         write!(formatter, "Ledger: {}/{} transactions succeeded\n",
                self.num_succeeded, self.num_transactions)?;
 
         for transaction in &self.ledger {
-            let transaction: Transaction = *transaction;
             write!(formatter, " - {}\n", transaction)?;
         }
+        Ok(())
     }
 }
