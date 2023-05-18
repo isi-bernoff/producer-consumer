@@ -89,7 +89,7 @@ impl Bank {
     /// Pops a `Transaction` from the `Bank`'s ledger and uses a `Thread`
     /// to process it concurrently
     /// #### Parameters
-    /// - `arc_bank`: The atomic reference to this `Mutex`-locked `Bank`
+    /// - `arc_bank`: The atomic reference counter to this `Mutex`-locked `Bank`
     /// - `thread_id`: The identifier of the thread processing the `Transaction`
     pub fn process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16) {
         let mut bank = arc_bank.lock().unwrap();
@@ -190,15 +190,15 @@ impl Display for Bank {
             let id: u16 = *id;
             let balance: f32 = *balance.lock().unwrap();
 
-            write!(formatter, " - Account {:05}: ${:.2}\n", id, balance)?;
+            write!(formatter, " - Account {}: ${:.2}\n", id, balance)?;
         }
 
         write!(formatter, "Ledger: {}/{} transactions succeeded\n",
                self.num_succeeded, self.num_transactions)?;
 
         for transaction in &self.ledger {
+            let transaction: Transaction = *transaction;
             write!(formatter, " - {}\n", transaction)?;
         }
-        Ok(())
     }
 }
