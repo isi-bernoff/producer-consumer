@@ -66,7 +66,7 @@ Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded`
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
-`true` if the deposit succeeded and`false` otherwise
+`true` if the deposit succeeded and `false` otherwise
 ```rs
 Bank::withdraw(&mut self, account_id: u16, amount: f32) -> bool
 ```
@@ -75,7 +75,7 @@ Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeede
 - `account_id`: The identifier of the account having its money withdrawn
 - `amount`: The amount of money being withdrawn
 #### Returns
-`true` if the withdrawal succeeded and`false` otherwise
+`true` if the withdrawal succeeded and `false` otherwise
 ```rs
 Bank::transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
@@ -85,6 +85,6 @@ Transfers money from one of this `Bank`'s `accounts` to another, incrementing `n
 - `to_id`: The identifier of the account having money transferred to it
 - `amount`: The amount of money being transferred
 #### Returns
-`true` if the transfer succeeded and`false` otherwise
+`true` if the transfer succeeded and `false` otherwise
 
 ###### Thanks to recent UMass MS graduate [Ryan Lee](https://github.com/rlee287) for ~~guarding~~ guiding me through the idiosyncrasies of Rust.

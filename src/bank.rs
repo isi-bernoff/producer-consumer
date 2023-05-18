@@ -90,7 +90,7 @@ impl Bank {
     /// to process it concurrently
     /// #### Parameters
     /// - `arc_bank`: The atomic reference counter to this `Mutex`-locked `Bank`
-    /// - `thread_id`: The identifier of the thread processing the `Transaction`
+    /// - `thread_id`: The identifier of the `Thread` processing the `Transaction`
     pub fn process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16) {
         let mut bank = arc_bank.lock().unwrap();
 
@@ -133,7 +133,7 @@ impl Bank {
     /// - `account_id`: The identifier of the account receiving the deposit
     /// - `amount`: The amount of money being deposited
     /// #### Returns
-    /// `true` if the deposit succeeded and`false` otherwise
+    /// `true` if the deposit succeeded and `false` otherwise
     pub fn deposit(&mut self, account_id: u16, amount: f32) -> bool {
         *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() += amount;
         self.num_succeeded += 1;
@@ -146,7 +146,7 @@ impl Bank {
     /// - `account_id`: The identifier of the account having its money withdrawn
     /// - `amount`: The amount of money being withdrawn
     /// #### Returns
-    /// `true` if the withdrawal succeeded and`false` otherwise
+    /// `true` if the withdrawal succeeded and `false` otherwise
     pub fn withdraw(&mut self, account_id: u16, amount: f32) -> bool {
         if amount > *self.accounts.get_mut(&account_id).unwrap().lock().unwrap() {
             return false;
@@ -164,7 +164,7 @@ impl Bank {
     /// - `to_id`: The identifier of the account having money transferred to it
     /// - `amount`: The amount of money being transferred
     /// #### Returns
-    /// `true` if the transfer succeeded and`false` otherwise
+    /// `true` if the transfer succeeded and `false` otherwise
     pub fn transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool {
         if from_id == to_id {
             return false;
