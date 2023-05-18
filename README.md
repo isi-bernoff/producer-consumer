@@ -55,7 +55,7 @@ Spawns `Threads` to process this `Bank`'s `ledger` concurrently
 Bank::process_transaction(arc_bank: Arc<Mutex<Bank>>, thread_id: u16)
 ```
 Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the
-deposit worked
+deposit succeeded
 #### Parameters
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
@@ -64,15 +64,16 @@ deposit worked
 ```rs
 Bank::deposit(&mut self, account_id: u16, amount: f32) -> bool
 ```
-Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the deposit worked
+Deposit money into one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the deposit succeeded
 #### Parameters
 - `account_id`: The identifier of the account receiving the deposit
 - `amount`: The amount of money being deposited
 #### Returns
 `true` if the deposit succeeded and`false` otherwise
+```rs
 Bank::withdraw(&mut self, account_id: u16, amount: f32) -> bool
 ```
-Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the withdrawal worked
+Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeeded` if the withdrawal succeeded
 #### Parameters
 - `account_id`: The identifier of the account having its money withdrawn
 - `amount`: The amount of money being withdrawn
@@ -81,7 +82,7 @@ Withdraws money from one of this `Bank`'s `accounts`, incrementing `num_succeede
 ```rs
 Bank::transfer(&mut self, from_id: u16, to_id: u16, amount: f32) -> bool
 ```
-Transfers money from one of this `Bank`'s `accounts` to another, incrementing `num_succeeded` if the transfer worked
+Transfers money from one of this `Bank`'s `accounts` to another, incrementing `num_succeeded` if the transfer succeeded
 #### Parameters
 - `from_id`: The identifier of the account having money transferred from it
 - `to_id`: The identifier of the account having money transferred to it
